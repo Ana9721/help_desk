@@ -1,0 +1,67 @@
+<?php
+require_once("../config/conexion.php");
+require_once("../models/Prioridad.php");
+$prioridad = new Prioridad();
+
+switch ($_GET["op"]) {
+    case "guardaryeditar":
+        $datos = $prioridad->get_prioridad_x_nom($_POST["prio_nom"]);
+        if (count($datos) == 0) {
+            if (empty($_POST["prio_id"])) {
+                $prioridad->insert_prioridad($_POST["prio_nom"]);
+                echo "1";
+            } else {
+                $prioridad->update_prioridad($_POST["prio_id"], $_POST["prio_nom"]);
+                echo "2";
+            }
+        } else {
+            echo "0";
+        }
+    break;
+
+    case "listar":
+        $datos = $prioridad->get_prioridad();
+        $data = array();
+        foreach ($datos as $row) {
+            $sub_array = array();
+            $sub_array[] = $row["prio_nom"];
+            $sub_array[] = '<button type="button" onClick="editar(' . $row["prio_id"] . ');"  id="' . $row["prio_id"] . '" class="btn btn-inline btn-warning btn-sm ladda-button"><i class="fa fa-edit"></i></button>';
+            $sub_array[] = '<button type="button" onClick="eliminar(' . $row["prio_id"] . ');"  id="' . $row["prio_id"] . '" class="btn btn-inline btn-danger btn-sm ladda-button"><i class="fa fa-trash"></i></button>';
+            $data[] = $sub_array;
+        }
+        $results = array(
+            "sEcho" => 1,
+            "iTotalRecords" => count($data),
+            "iTotlDisplayRecords" => count($data),
+            "aaData" => $data
+        );
+        echo json_encode($results);
+        break;
+
+    case "eliminar":
+        $prioridad->delete_prioridad($_POST["prio_id"]);
+        break;
+
+    case "mostrar";
+        $datos = $prioridad->get_prioridad_x_id($_POST["prio_id"]);
+        if (is_array($datos) == true and count($datos) > 0) {
+            foreach ($datos as $row) {
+                $output["prio_id"] = $row["prio_id"];
+                $output["prio_nom"] = $row["prio_nom"];
+            }
+            echo json_encode($output);
+        }
+        break;
+
+    case "combo":
+        $datos = $prioridad->get_prioridad();
+        $html = "";
+        $html .= "<option value=''>Seleccionar</option>";
+        if (is_array($datos) == true and count($datos) > 0) {
+            foreach ($datos as $row) {
+                $html .= "<option value='" . $row['prio_id'] . "'>" . $row['prio_nom'] . "</option>";
+            }
+            echo $html;
+        }
+        break;
+}

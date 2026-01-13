@@ -1,0 +1,6 @@
+*corregir mant.usuario no agrega usuario ni edita la info
+esto desde la seccion 58 de encriptacion
+
+*no edita la info esto a aprtir tambien de la seccion 58.
+
+*notificaciones no las meustra 
